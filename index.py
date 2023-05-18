@@ -51,7 +51,7 @@ class AutomationProcess:
     
     def profile_page(self):
 
-        edit_element = self.find_element_by_xpath('//div[@role="tablist"]/div[2]/div/div/div[2]/div/div/div/div/div/button')
+        edit_element = WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, '//div[@role="tablist"]/div[2]/div/div/div[2]/div/div/div/div/div/button')))
         edit_element.click()
 
         self.process_page_one()
@@ -107,7 +107,7 @@ class AutomationProcess:
         propose_arrival_date.send_keys('23 Dec 2023') # Example of format: 20 Dec 2023 
 
         # Question 8: Does the applicant have a letter of government support to attach to this visa application?
-        government_choice = 2 # Yes is 1 | No is 2
+        government_choice = 1 # Yes is 1 | No is 2
         goverment_question = self.find_element_by_xpath(f'//div[@class="wc-content"]/div[@class="wc-panel"]/div[@class="wc-content"]/div/div[@class="wc-content"]/div[19]/div/div[2]/div[2]/div/div/div[1]/fieldset/div/label/input[@value={government_choice}]')
         goverment_question.click()
 
@@ -119,7 +119,7 @@ class AutomationProcess:
     def process_page_three(self):
 
         # Question 1: Family name
-        if self.page_three_count == 0:
+        if self.page_three_count != 1:
             family_name = self.find_element_by_xpath('//div[@class="wc-content"]/div[@class="wc-panel"]/div[@class="wc-content"]/div/div[@class="wc-content"]/div[6]/div/div[1]/div/div[1]/div/div/div[2]/div/div/div[1]/span/input')
             family_name.clear()
             family_name.send_keys('Le')
@@ -219,35 +219,151 @@ class AutomationProcess:
             is_health_examination = self.find_element_by_xpath(f'//div[@class="wc-content"]/div[@class="wc-panel"]/div[@class="wc-content"]/div/div[@class="wc-content"]/div[19]/div/div[2]/div/div[2]/div[2]/div/div/div[1]/fieldset/div/label/input[@value={is_health_examination_choice}]')
             is_health_examination.click()
 
-
             #--------------------------------------------------------
-
             # We answer all questions above first then we come to this question 
             # Question 11: # Add details
-
             add_details_button = self.find_element_by_xpath('//div[@class="wc-content"]/div[@class="wc-panel"]/div[@class="wc-content"]/div/div[@class="wc-content"]/div[9]/div/div[7]/div/button')
             add_details_button.click()
-            self.page_three_count += 1
-            self.process_sub_page_three()
 
             #-------------------------------------------------------
-
+            self.process_sub_page_three()
         else:
+            next_button = self.find_element_by_xpath('//div[@class="wc-borderlayout"]/div/div[2]/button')
+            next_button.click()
             self.process_page_four()
 
-
     def process_sub_page_three(self):
-        self.process_page_three()
-        
+
+        # Question 1: Family name
+        family_name = self.find_element_by_xpath('//section/div[@class="wc-content"]/div/div/div[5]/div/div/div/div/div[3]/div/div[1]/div/div/div[2]/div/div/div[1]/span/input')
+        family_name.clear()
+        family_name.send_keys("LE")
+
+        # Question 2: Given Name
+        given_name = self.find_element_by_xpath('//section/div[@class="wc-content"]/div/div/div[5]/div/div/div/div/div[3]/div/div[2]/div/div/div[2]/div/div/div[1]/span/input')
+        given_name.clear()
+        given_name.send_keys("THANH NGHI")
+
+        # Question 3: Identification number
+        identification_number = self.find_element_by_xpath('//section/div[@class="wc-content"]/div/div/div[5]/div/div/div/div/div[4]/div/div/div[2]/span/input')
+        identification_number.clear()
+        identification_number.send_keys("079200023361")
+
+        # Question 4: Country of issue
+        time.sleep(1)
+        country_of_issue = Select(self.find_element_by_xpath('//section/div[@class="wc-content"]/div/div/div[5]/div/div/div/div/div[5]/div/div/div[2]/span/select'))
+        country_of_issue.select_by_visible_text("VIETNAM")
+
+        # Question 5: Date of issue
+        date_of_issue = self.find_element_by_xpath('//section/div[@class="wc-content"]/div/div/div[5]/div/div/div/div/div[7]/div/div/div[2]/div/input')
+        date_of_issue.clear()
+        date_of_issue.send_keys("15 April 2021")
+
+        # Question 6:  Date of expiry
+        date_of_expiry = self.find_element_by_xpath('//section/div[@class="wc-content"]/div/div/div[5]/div/div/div/div/div[8]/div/div/div[2]/div/input')
+        date_of_expiry.clear()
+        date_of_expiry.send_keys("15 April 2036")
+
+        confirm_button = self.find_element_by_xpath('//div[@class="wc-borderlayout"]/div/div[2]/button')
+        confirm_button.click()
+
+        self.page_three_count += 1
+        self.process_page_three()       
     
     def process_page_four(self):
-        return
+
+        # Question 1: Is the above information correct?
+        confirm_indentification_choice = 1
+        confirm_indentification = self.find_element_by_xpath(f'//section/div[@class="wc-content"]/div/div/div[5]/div/div/div/div/div/div/div[10]/div/div/div[2]/div/div/div[1]/fieldset/div/label/input[@value={confirm_indentification_choice}]')
+        confirm_indentification.click()
+
+        next_button = self.find_element_by_xpath('//div[@class="wc-content"]/div[@class="wc-panel"]/div/div[@class="wc-cell"][7]/div/div/div/div[2]/button')
+        next_button.click()
+        self.process_page_five()
     
     def process_page_five(self):
+
+        # Question 1: Has this applicant previously travelled to Australia or previously applied for a visa?
+        is_travel_to_au_choice = 2
+        if is_travel_to_au_choice == 2:
+            is_travel_to_au = self.find_element_by_xpath('//section/div[@class="wc-content"]/div/div/div[5]/div/div/div/div/div/div/div[3]/div/div[2]/div/div[2]/div[2]/fieldset/div/label/input[@value="' + str(is_travel_to_au_choice) + '"]')
+            is_travel_to_au.click()
+
+            next_button = self.find_element_by_xpath('//div[@class="wc-content"]/div[@class="wc-panel"]/div/div[@class="wc-cell"][7]/div/div/div/div[2]/button')
+            next_button.click()
+            self.process_page_six()
+
+    def process_page_six(self):
+
+        # Question 1: Usual country of residence
+        time.sleep(2)
+        country_field = Select(WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, '//div[@class="wc-content"]/div[@class="wc-panel"]/div/div[@class="wc-cell"][5]/div/div/div/div/div/div/div[2]/div/div[2]/div/div/div[2]/div/div/div[1]/span/select')))) 
+        country_field.select_by_visible_text('VIETNAM')
+
+        # Question 2: Office
+        office_field = self.find_element_by_xpath('//div[@class="wc-content"]/div[@class="wc-panel"]/div/div[@class="wc-cell"][5]/div/div/div/div/div/div/div[3]/div/div[4]/div/div/div[2]/div/div/span/input')
+        office_field.clear()
+        office_field.send_keys('Vietnam, Ho Chi Minh City')
+
+        # (Residential address)
+        # Question 3: Country 
+        country_residental = Select(WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, '//div[@class="wc-content"]/div[@class="wc-panel"]/div/div[@class="wc-cell"][5]/div/div/div/div/div/div/div[4]/div/div[3]/div/div[2]/div/div/div[2]/span/select'))))
+        country_residental.select_by_visible_text('VIETNAM')
+
+        # Question 4: Address
+        address_residental_one = self.find_element_by_xpath('//div[@class="wc-content"]/div[@class="wc-panel"]/div/div[@class="wc-cell"][5]/div/div/div/div/div/div/div[4]/div/div[3]/div/div[3]/div/div/div[2]/div/div/div[1]/span/input')
+        address_residental_one.clear()
+        address_residental_one.send_keys('173/45 Pham Phu Thu')
+
+        address_residental_two = self.find_element_by_xpath('//div[@class="wc-content"]/div[@class="wc-panel"]/div/div[@class="wc-cell"][5]/div/div/div/div/div/div/div[4]/div/div[3]/div/div[4]/div/div/div[2]/span/input')
+        address_residental_two.clear()
+        address_residental_two.send_keys('Ward 11, Tan Binh district')
+
+
+        # Question 5: State or Province: 
+        state_residental = Select(WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, '//div[@class="wc-content"]/div[@class="wc-panel"]/div/div[@class="wc-cell"][5]/div/div/div/div/div/div/div[4]/div/div[3]/div/div[6]/div/div[2]/div/div[2]/div/div/div[2]/span/select')))) 
+        time.sleep(3)
+        state_residental.select_by_visible_text("HO CHI MINH (SAI GON)")
+
+        # Question 6: Is the postal address the same as the residential address?
+        is_postal_choice = 1
+        is_postal = self.find_element_by_xpath(f'//div[@class="wc-content"]/div[@class="wc-panel"]/div/div[@class="wc-cell"][5]/div/div/div/div/div/div/div[5]/div/div[2]/div/div[2]/div[2]/div/div/div/fieldset/div/label/input[@value={is_postal_choice}]')
+        is_postal.click()
+
+        # Question 7: Mobile / Cell phone
+        mobile_field = self.find_element_by_xpath('//div[@class="wc-content"]/div[@class="wc-panel"]/div/div[@class="wc-cell"][5]/div/div/div/div/div/div/div[6]/div/div[5]/div/div/div[2]/span/input')
+        mobile_field.clear()
+        mobile_field.send_keys('0936589478')
+
+        # Question 8: Email address
+        email_field = self.find_element_by_xpath('//div[@class="wc-content"]/div[@class="wc-panel"]/div/div[@class="wc-cell"][5]/div/div/div/div/div/div/div[7]/div/div[2]/div/div/div[2]/div/div/div[1]/span/input')
+        email_field.clear()
+        email_field.send_keys('nghilt19411@gmail.com')
+
+        next_button = self.find_element_by_xpath('//div[@class="wc-content"]/div[@class="wc-panel"]/div/div[@class="wc-cell"][7]/div/div/div/div[2]/button')
+        next_button.click()
+        self.process_page_seven()
+
+    def process_page_seven(self):
+
+        # Does the applicant authorise another person to receive written correspondence on their behalf?
+        # This authorises the department to send the authorised person all written correspondence that would otherwise be sent directly to the applicant.
+
+        # NO
+        # YES_MIGRATION_AGENT
+        # YES_LEGAL_PRACTITIONER
+        # YES_ANOTHER_PERSON
+
+        is_authorise_choice = "NO"
+        is_authorise = self.find_element_by_xpath('//div[@class="wc-content"]/div[@class="wc-panel"]/div/div[@class="wc-cell"][5]/div/div/div/div/div/div/div[2]/div/div[2]/div[2]/fieldset/div/label/input[@value="' + str(is_authorise_choice) + '"]')
+        is_authorise.click()
+
+        next_button = self.find_element_by_xpath('//div[@class="wc-content"]/div[@class="wc-panel"]/div/div[@class="wc-cell"][7]/div/div/div/div[2]/button')
+        next_button.click()
+     
+    def process_page_eight(self):
         return
 
-
-    
 
 automation_process = AutomationProcess()
 automation_process.open_browser()
